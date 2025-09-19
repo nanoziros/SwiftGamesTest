@@ -12,9 +12,11 @@ namespace Scripts
         [SerializeField] private RectTransform _stickParent;
 
         private readonly Subject<Vector2> _onInput = new();
+        private readonly Subject<Unit> _onInputEnd = new();
         private bool _isDragging;
         
         public IObservable<Vector2> OnInput => _onInput;
+        public IObservable<Unit> OnInputEnd => _onInputEnd;
 
         private void Update()
         {
@@ -43,6 +45,7 @@ namespace Scripts
         public void OnPointerUp(PointerEventData eventData)
         {
             ResetStick();
+            _onInputEnd.OnNext(Unit.Default);
         }
         
         private void OnApplicationPause(bool pauseStatus)

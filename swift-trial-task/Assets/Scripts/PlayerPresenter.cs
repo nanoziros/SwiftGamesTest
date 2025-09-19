@@ -23,7 +23,7 @@ namespace Scripts
         public void Initialize()
         {
             _joystickView.OnInput.Subscribe(_playerView.Move).AddTo(_disposer);
-            
+            _joystickView.OnInputEnd.Subscribe(_ => _playerView.OnMoveEnd()).AddTo(_disposer);
             _playerModel.CurrentHealth.Subscribe(_playerView.UpdateHealth).AddTo(_disposer);
         }
     }

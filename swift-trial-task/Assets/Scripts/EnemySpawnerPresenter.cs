@@ -1,4 +1,6 @@
+using System;
 using Cysharp.Threading.Tasks;
+using Scripts.Utils;
 using UnityEngine;
 using Zenject;
 
@@ -8,17 +10,19 @@ namespace Scripts
     public class EnemySpawnerPresenter : IInitializable
     {
         private readonly IEnemySpawnerModel _enemySpawnerModel;
-        private readonly ICameraView _playerCamera;
+        private readonly Camera _playerCamera;
         private readonly Transform _enemiesParent;
         private readonly EnemyView _enemyPrefab;
+        private readonly PlayerView _playerView;
 
         private GameObjectPool<EnemyView> _enemyPool;
         
-        public EnemySpawnerPresenter(EnemyView enemyPrefab, Transform enemiesParent, IEnemySpawnerModel enemySpawnerModel, ICameraView playerCamera)
+        public EnemySpawnerPresenter(EnemyView enemyPrefab, PlayerView playerView, Transform enemiesParent, IEnemySpawnerModel enemySpawnerModel, Camera playerCamera)
         {
             _enemySpawnerModel = enemySpawnerModel;
             _playerCamera = playerCamera;
             _enemyPrefab = enemyPrefab;
+            _playerView = playerView;
             _enemiesParent = enemiesParent;
         }
 
@@ -36,10 +40,15 @@ namespace Scripts
             // If the spawning loop can be cancelled, we could add a CancellationTokenSource check in here
             while (_enemyPool.Count < maxActiveEnemies)
             {
-                // todo: spawn enemy here
-                
-                await UniTask.Delay(System.TimeSpan.FromSeconds(spawnInterval));
+                SpawnEnemy();                
+                await UniTask.Delay(TimeSpan.FromSeconds(spawnInterval));
             }
+        }
+
+        private void SpawnEnemy()
+        {
+            var enemy = _enemyPool.Get();
+            enemy.transform.position = _playerCamera.GetRandomOffScreenPosition(enemy.Bounds, _playerView.Velocity);
         }
     }
 }

@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _joyStick: {fileID: 932757184}
   _playerView: {fileID: 6598591594767267528}
-  _cameraView: {fileID: 412598294}
+  _camera: {fileID: 412598296}
   _enemyPrefab: {fileID: 7455641530600471565, guid: 1988e5cf71980454697f4307df2923e1, type: 3}
   _enemiesParent: {fileID: 1350755283}
 --- !u!4 &343482765
@@ -204,17 +204,11 @@ MonoBehaviour:
   _parentNewObjectsUnderSceneContext: 0
   _contractNames: []
   _parentContractNames: []
---- !u!114 &412598294 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 92545316338207262, guid: 88589e8513862483c82c6fe8ca24de4c, type: 3}
+--- !u!20 &412598296 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 1057418709907250524, guid: 88589e8513862483c82c6fe8ca24de4c, type: 3}
   m_PrefabInstance: {fileID: 6598591594767267527}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 993d744ae65a48768b1fbeb7cd3a8025, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &524100451
 PrefabInstance:
   m_ObjectHideFlags: 0

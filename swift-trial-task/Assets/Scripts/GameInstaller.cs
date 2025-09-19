@@ -8,7 +8,7 @@ namespace Scripts
     {
         [SerializeField] private JoystickView _joyStick;
         [SerializeField] private PlayerView _playerView;
-        [SerializeField] private CameraView _cameraView;
+        [SerializeField] private Camera _camera;
         
         [SerializeField] private EnemyView _enemyPrefab;
         [SerializeField] private Transform _enemiesParent;
@@ -27,7 +27,7 @@ namespace Scripts
             Container.BindInstance(_playerView);
             Container.BindInstance(_joyStick);
             
-            Container.BindInterfacesTo<CameraView>().FromInstance(_cameraView).AsSingle();
+            Container.BindInstance(_camera);
             
             Container.BindInterfacesTo<PlayerModel>().AsSingle();
             Container.BindInterfacesTo<PlayerPresenter>().AsSingle().NonLazy();
