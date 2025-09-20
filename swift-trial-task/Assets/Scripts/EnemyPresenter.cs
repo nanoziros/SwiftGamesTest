@@ -9,7 +9,8 @@ namespace Scripts
 {
     public class EnemyPresenter
     {
-        private readonly EnemyView _view;
+        private readonly PlayerView _playerView;
+        private readonly EnemyView _enemyView;
         private readonly IEnemyModel _model;
         private readonly Camera _camera;
         private readonly GameObjectPool<EnemyView> _pool;
@@ -17,31 +18,42 @@ namespace Scripts
         private CancellationTokenSource _visibilityCts;
         private CancellationTokenSource _despawnCts;
 
-        public EnemyPresenter(EnemyView enemyView, IEnemyModel model, Camera camera, GameObjectPool<EnemyView> pool, CompositeDisposable disposer)
+        public EnemyPresenter(EnemyView enemyEnemyView, PlayerView playerView, IEnemyModel model, Camera camera, GameObjectPool<EnemyView> pool, CompositeDisposable disposer)
         {
-            _view = enemyView;
+            _playerView = playerView;
+            _enemyView = enemyEnemyView;
             _model = model;
             _camera = camera;
             _pool = pool;
 
             StartVisibilityLoop();
             
-            _view.OnEnabled.Subscribe(_=> StartVisibilityLoop()).AddTo(disposer);
-            _view.OnDisabled.Subscribe(_ => StopVisibilityLoop()).AddTo(disposer);
+            _enemyView.OnEnabled.Subscribe(_=> StartVisibilityLoop()).AddTo(disposer);
+            _enemyView.OnDisabled.Subscribe(_ => StopVisibilityLoop()).AddTo(disposer);
+        }
+
+        public void SetRandomOffScreenState()
+        {
+            _enemyView.SetRandomOffScreenState(_playerView.Velocity, _camera);
         }
 
         private void StartVisibilityLoop()
         {
-            if (_visibilityCts == null || _visibilityCts.IsCancellationRequested)
+            if (_visibilityCts is { IsCancellationRequested: false })
             {
-                _visibilityCts = new CancellationTokenSource();
-                VisibilityLoop(_visibilityCts.Token).Forget();
+                return;
             }
+
+            _visibilityCts?.Dispose();
+            _visibilityCts = new CancellationTokenSource();
+            VisibilityLoop(_visibilityCts.Token).Forget();
         }
 
         private void StopVisibilityLoop()
         {
             _visibilityCts?.Cancel();
+            _visibilityCts?.Dispose();
+            _visibilityCts = null;
         }
         
         private async UniTaskVoid VisibilityLoop(CancellationToken token)
@@ -57,12 +69,13 @@ namespace Scripts
 
         private void CheckVisibility()
         {
-            bool offScreen = _camera.IsOffScreen(_view.Bounds);
+            bool offScreen = _camera.IsOffScreen(_enemyView.Bounds);
 
             if (offScreen)
             {
                 if (_despawnCts == null || _despawnCts.IsCancellationRequested)
                 {
+                    _despawnCts?.Dispose();
                     _despawnCts = new CancellationTokenSource();
                     DespawnAfterDelay(_despawnCts.Token).Forget();
                 }
@@ -70,6 +83,8 @@ namespace Scripts
             else
             {
                 _despawnCts?.Cancel();
+                _despawnCts?.Dispose();
+                _despawnCts = null;
             }
         }
 
@@ -78,7 +93,7 @@ namespace Scripts
             try
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(_model.EnemyDespawnDelay), cancellationToken: token);
-                _pool.Return(_view);
+                _pool.Return(_enemyView);
             }
             catch (OperationCanceledException)
             {

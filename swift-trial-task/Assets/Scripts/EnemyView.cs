@@ -1,4 +1,5 @@
 using System;
+using Scripts.Utils;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,7 +12,6 @@ namespace Scripts
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private Slider _healthBar;
         
-        
         private readonly Subject<Unit> _onEnabled = new();
         private readonly Subject<Unit> _onDisabled = new();
         
@@ -19,7 +19,12 @@ namespace Scripts
         public IObservable<Unit> OnDisabled => _onDisabled;
         
         public Bounds Bounds => GetFullBounds();
-
+        
+        public void SetRandomOffScreenState(Vector3 playerVelocity, Camera playerCamera)
+        {
+            transform.position = playerCamera.GetRandomOffScreenPosition(Bounds, playerVelocity);
+        }
+        
         private void OnEnable()
         {
             _onEnabled.OnNext(Unit.Default);

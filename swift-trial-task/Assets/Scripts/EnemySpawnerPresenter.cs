@@ -9,7 +9,6 @@ using Zenject;
 
 namespace Scripts
 {
-    // If later we want to have different kinds of spawners, we could replace the EnemyView with a generic Type and define several EnemySpawnerPresenter with different types during the dependency binding step
     public class EnemySpawnerPresenter : IInitializable
     {
         private readonly IEnemySpawnerModel _enemySpawnerModel;
@@ -67,13 +66,12 @@ namespace Scripts
         private void SpawnEnemy()
         {
             var view = _enemyPool.Get();
-            if (!_enemyPresenters.ContainsKey(view))
+            if (!_enemyPresenters.TryGetValue(view, out var presenter))
             {
-                var presenter = new EnemyPresenter(view, _enemyModel, _playerCamera, _enemyPool, _disposer);
-                _enemyPresenters.Add(view, presenter);
+                presenter = new EnemyPresenter(view, _playerView, _enemyModel, _playerCamera, _enemyPool, _disposer);
+                _enemyPresenters[view] = presenter;
             }
-
-            view.transform.position = _playerCamera.GetRandomOffScreenPosition(view.Bounds, _playerView.Velocity);
+            presenter.SetRandomOffScreenState();
         }
     }
 }
