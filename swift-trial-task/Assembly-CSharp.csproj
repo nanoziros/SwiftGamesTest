@@ -45,13 +45,16 @@
     <Analyzer Include="C:\UnityDownloads\Unity2022.3.47\Editor\Data\Tools\Unity.SourceGenerators\Unity.Properties.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\PlayerView.cs" />
     <Compile Include="Assets\Scripts\IEnemySpawnerModel.cs" />
-    <Compile Include="Assets\Scripts\GameObjectPool.cs" />
+    <Compile Include="Assets\Scripts\PlayerView.cs" />
+    <Compile Include="Assets\Scripts\EnemyModel.cs" />
     <Compile Include="Assets\Scripts\EnemySpawnerPresenter.cs" />
     <Compile Include="Assets\Scripts\JoystickView.cs" />
+    <Compile Include="Assets\Scripts\EnemyPresenter.cs" />
     <Compile Include="Assets\Scripts\GameInstaller.cs" />
+    <Compile Include="Assets\Scripts\Utils\GameObjectPool.cs" />
     <Compile Include="Assets\Scripts\IPlayerModel.cs" />
+    <Compile Include="Assets\Scripts\IEnemyModel.cs" />
     <Compile Include="Assets\Scripts\PlayerModel.cs" />
     <Compile Include="Assets\Scripts\EnemyView.cs" />
     <Compile Include="Assets\Scripts\PlayerPresenter.cs" />

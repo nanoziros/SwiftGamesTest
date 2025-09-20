@@ -32,8 +32,11 @@ namespace Scripts
             Container.BindInterfacesTo<PlayerModel>().AsSingle();
             Container.BindInterfacesTo<PlayerPresenter>().AsSingle().NonLazy();
             
+            Container.BindInterfacesTo<EnemyModel>().AsSingle();
+            
             Container.BindInstance(_enemiesParent).AsSingle();
             Container.BindInstance(_enemyPrefab).AsSingle();     
+            
             Container.BindInterfacesTo<EnemySpawnerModel>().AsSingle();
             Container.BindInterfacesTo<EnemySpawnerPresenter>().AsSingle().NonLazy();
         }

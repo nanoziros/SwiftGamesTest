@@ -1,3 +1,5 @@
+using System;
+using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,25 +7,36 @@ namespace Scripts
 {
     public class EnemyView : MonoBehaviour
     {
+        [SerializeField] private RectTransform _healthBarRectTransform;
         [SerializeField] private SpriteRenderer _spriteRenderer;
         [SerializeField] private Slider _healthBar;
         
-        private RectTransform _healthBarRectTransform;
+        
+        private readonly Subject<Unit> _onEnabled = new();
+        private readonly Subject<Unit> _onDisabled = new();
+        
+        public IObservable<Unit> OnEnabled => _onEnabled;
+        public IObservable<Unit> OnDisabled => _onDisabled;
         
         public Bounds Bounds => GetFullBounds();
-        
+
+        private void OnEnable()
+        {
+            _onEnabled.OnNext(Unit.Default);
+        }
+
+        private void OnDisable()
+        {
+            _onDisabled.OnNext(Unit.Default);
+        }
+
         private Bounds GetFullBounds()
         {
             var bounds = _spriteRenderer.bounds;
 
             Vector3[] corners = new Vector3[4];
-
-            if (_healthBarRectTransform == null)
-            {
-                _healthBarRectTransform =  _healthBar.GetComponent<RectTransform>();
-            }
             _healthBarRectTransform.GetWorldCorners(corners);
-            Bounds healthBounds = new Bounds(corners[0], Vector3.zero);
+            Bounds healthBounds = new(corners[0], Vector3.zero);
             
             for (int i = 1; i < 4; i++)
             {
@@ -34,6 +47,5 @@ namespace Scripts
 
             return bounds;
         }
-
     }
 }

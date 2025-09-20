@@ -1,6 +1,5 @@
 using UniRx;
 using Zenject;
-using UniRx;
 
 namespace Scripts
 {

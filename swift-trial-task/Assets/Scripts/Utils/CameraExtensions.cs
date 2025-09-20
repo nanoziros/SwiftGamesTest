@@ -63,7 +63,6 @@ namespace Scripts.Utils
 
             float total = topWeight + bottomWeight + leftWeight + rightWeight;
             
-            Debug.Log($"{biasDirection}- {total}- T {topWeight}-B {bottomWeight}-R {rightWeight}- L{leftWeight}");
             if (total <= 0f)
             {
                 return GetRandomViewSide();
@@ -90,6 +89,15 @@ namespace Scripts.Utils
         private static ViewSide GetRandomViewSide()
         {
             return (ViewSide)Random.Range(0, 4);
+        }
+        
+        public static bool IsOffScreen(this Camera camera, Bounds bounds)
+        {
+            Vector3 min = bounds.min;
+            Vector3 max = bounds.max;
+            Rect cameraRect =camera.GetWorldRect();
+            return max.x < cameraRect.xMin || min.x > cameraRect.xMax ||
+                   max.y < cameraRect.yMin || min.y > cameraRect.yMax;
         }
 
 
