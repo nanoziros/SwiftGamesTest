@@ -32,9 +32,10 @@ namespace Scripts
             _enemyView.OnDisabled.Subscribe(_ => StopVisibilityLoop()).AddTo(disposer);
         }
 
-        public void SetRandomOffScreenState()
+        public void SetRandomOffScreenPosition()
         {
-            _enemyView.SetRandomOffScreenState(_playerView.Velocity, _camera);
+            var targetPosition = _camera.GetRandomOffScreenPosition(_enemyView.Bounds, _playerView.Velocity);
+            _enemyView.SetPosition(targetPosition);
         }
 
         private void StartVisibilityLoop()

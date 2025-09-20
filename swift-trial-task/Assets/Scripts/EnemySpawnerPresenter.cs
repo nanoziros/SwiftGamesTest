@@ -71,7 +71,7 @@ namespace Scripts
                 presenter = new EnemyPresenter(view, _playerView, _enemyModel, _playerCamera, _enemyPool, _disposer);
                 _enemyPresenters[view] = presenter;
             }
-            presenter.SetRandomOffScreenState();
+            presenter.SetRandomOffScreenPosition();
         }
     }
 }

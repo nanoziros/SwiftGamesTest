@@ -20,9 +20,9 @@ namespace Scripts
         
         public Bounds Bounds => GetFullBounds();
         
-        public void SetRandomOffScreenState(Vector3 playerVelocity, Camera playerCamera)
+        public void SetPosition(Vector3 position)
         {
-            transform.position = playerCamera.GetRandomOffScreenPosition(Bounds, playerVelocity);
+            transform.position = position;
         }
         
         private void OnEnable()
