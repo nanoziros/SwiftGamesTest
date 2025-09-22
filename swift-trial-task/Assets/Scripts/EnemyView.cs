@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
@@ -70,6 +71,11 @@ namespace Scripts
         private void OnTriggerEnter2D(Collider2D other)
         {
             _onTriggerEntered.OnNext(other);
+        }
+        
+        public void UpdateHealth(float currentNormalizedHealth)
+        {
+            _healthBar.DOValue(currentNormalizedHealth, .2f).SetEase(Ease.OutSine);
         }
     }
 }

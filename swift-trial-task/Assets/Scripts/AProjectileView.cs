@@ -6,7 +6,7 @@ namespace Scripts
 {
     public abstract class AProjectileView : MonoBehaviour
     {
-        [SerializeField, Range(float.Epsilon, 5f)]
+        [SerializeField, Range(float.Epsilon, 20f)]
         private float _speed;
         private Vector2 _velocity;
         public Vector2 Velocity => _velocity;

@@ -3,7 +3,7 @@ using Zenject;
 
 namespace Scripts
 {
-    public class PlayerPresenter : IInitializable
+    public class PlayerPresenter : IInitializable, IPlayerHitReceiver
     {
         private readonly JoystickView _joystickView;
         private readonly PlayerView _playerView;
@@ -21,7 +21,17 @@ namespace Scripts
         {
             _joystickView.OnInput.Subscribe(_playerView.Move).AddTo(_disposer);
             _joystickView.OnInputEnd.Subscribe(_ => _playerView.OnMoveEnd()).AddTo(_disposer);
-            _playerModel.CurrentHealth.Subscribe(_playerView.UpdateHealth).AddTo(_disposer);
+            _playerModel.CurrentHealth
+                .Subscribe(currentHealth =>
+                {
+                    _playerView.UpdateHealth(currentHealth / _playerModel.MaxHealth);
+                })
+                .AddTo(_disposer);
+        }
+        
+        public void ReceiveHit(float damage)
+        {
+            _playerModel.TakeDamage(damage);
         }
     }
 }

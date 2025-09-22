@@ -42,7 +42,7 @@ namespace Scripts
 
         private void BindEnemies()
         {
-            Container.BindInterfacesTo<EnemyModel>().AsSingle();
+            Container.BindFactory<EnemyModel, EnemyModel.Factory>();
             Container.BindInstance(_enemiesParent).WithId(PoolTransformIds.EnemiesParentId);
             Container.BindInstance(_enemyPrefab).AsSingle();     
             Container.BindInterfacesTo<EnemySpawnerModel>().AsSingle();

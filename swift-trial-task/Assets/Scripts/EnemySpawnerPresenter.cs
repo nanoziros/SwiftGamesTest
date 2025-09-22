@@ -15,9 +15,10 @@ namespace Scripts
         private readonly Camera _playerCamera;
         private readonly Transform _enemiesParent;
         private readonly EnemyView _enemyPrefab;
-        private readonly IEnemyModel _enemyModel;
+        private readonly EnemyModel.Factory _enemyModelFactory;
         private readonly PlayerView _playerView;
         private readonly CompositeDisposable _disposer;
+        private readonly IPlayerHitReceiver _playerHitReceiver;
 
         private GameObjectPool<EnemyView> _enemyPool;
         private readonly Dictionary<EnemyView, EnemyPresenter> _enemyPresenters = new();
@@ -27,20 +28,22 @@ namespace Scripts
         
         public EnemySpawnerPresenter(
             EnemyView enemyPrefab, 
-            IEnemyModel enemyModel, 
+            EnemyModel.Factory enemyModelFactory, 
             PlayerView playerView,
             [Inject(Id = PoolTransformIds.EnemiesParentId)] Transform enemiesParent, 
             IEnemySpawnerModel enemySpawnerModel, 
             Camera playerCamera, 
+            IPlayerHitReceiver playerHitReceiver,
             CompositeDisposable disposer)
         {
+            _enemyModelFactory = enemyModelFactory;
             _enemySpawnerModel = enemySpawnerModel;
             _playerCamera = playerCamera;
             _enemyPrefab = enemyPrefab;
             _playerView = playerView;
             _enemiesParent = enemiesParent;
-            _enemyModel = enemyModel;
             _disposer = disposer;
+            _playerHitReceiver = playerHitReceiver;
         }
 
         public void Initialize()
@@ -77,10 +80,13 @@ namespace Scripts
             var view = _enemyPool.Get();
             if (!_enemyPresenters.TryGetValue(view, out var presenter))
             {
-                presenter = new EnemyPresenter(view, _playerView, _enemyModel, _playerCamera, _disposer);
+                var enemyModel = _enemyModelFactory.Create();
+                presenter = new EnemyPresenter(view, _playerView, enemyModel, _playerCamera, _playerHitReceiver, _disposer);
                 presenter.OnDespawn.Subscribe(enemyView => _enemyPool.Return(enemyView)).AddTo(_disposer);
                 _enemyPresenters[view] = presenter;
             }
+
+            presenter.Initialize();
             presenter.SetRandomOffScreenPosition();
             presenter.StartChasingPlayer();
         }

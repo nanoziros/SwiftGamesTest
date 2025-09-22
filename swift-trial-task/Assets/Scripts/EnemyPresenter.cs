@@ -9,6 +9,7 @@ namespace Scripts
 {
     public class EnemyPresenter
     {
+        private readonly IPlayerHitReceiver _playerHitReceiver;
         private readonly PlayerView _playerView;
         private readonly EnemyView _enemyView;
         private readonly IEnemyModel _model;
@@ -23,20 +24,44 @@ namespace Scripts
         public bool IsOffScreen => _isOffScreen;
         public Vector2 Position => _enemyView.Position;
 
-        public EnemyPresenter(EnemyView enemyEnemyView, PlayerView playerView, IEnemyModel model, Camera camera, CompositeDisposable disposer)
+        public EnemyPresenter(
+            EnemyView enemyEnemyView,
+            PlayerView playerView,
+            IEnemyModel model,
+            Camera camera,
+            IPlayerHitReceiver playerHitReceiver,
+            CompositeDisposable disposer)
         {
             _playerView = playerView;
             _enemyView = enemyEnemyView;
             _model = model;
             _camera = camera;
+            _playerHitReceiver = playerHitReceiver;
+            
+            _model.CurrentHealth
+                .Subscribe(currentHealth =>
+                {
+                    _enemyView.UpdateHealth(currentHealth / _model.MaxHealth);
+                })
+                .AddTo(disposer);
+            _model.CurrentHealth
+                .Where(health => health <= 0)
+                .Distinct()
+                .Subscribe(_ =>
+                {
+                    StopVisibilityCheckLoop();
+                    StopDespawnDelay();
+                    _onDespawn.OnNext(_enemyView);
+                })
+                .AddTo(disposer);
             
             _enemyView.OnTriggerEntered.Subscribe(OnTriggerEnter).AddTo(disposer);
+            
             _enemyView.OnEnabled.Subscribe(_=>
             {
                 StartChasingPlayer();
                 StartVisibilityCheckLoop();
             }).AddTo(disposer);
-            
             _enemyView.OnDisabled.Subscribe(_ =>
             {
                 StopChasingPlayer();
@@ -44,6 +69,11 @@ namespace Scripts
             }).AddTo(disposer);
             
             StartVisibilityCheckLoop();
+        }
+
+        public void Initialize()
+        {
+            _model.Reset();
         }
 
         public void SetRandomOffScreenPosition()
@@ -94,13 +124,6 @@ namespace Scripts
             _visibilityCts = new CancellationTokenSource();
             CheckEnemyVisibility(_visibilityCts.Token).Forget();
         }
-
-        private void StopVisibilityCheckLoop()
-        {
-            _visibilityCts?.Cancel();
-            _visibilityCts?.Dispose();
-            _visibilityCts = null;
-        }
         
         private async UniTaskVoid CheckEnemyVisibility(CancellationToken token)
         {
@@ -128,9 +151,7 @@ namespace Scripts
             }
             else
             {
-                _despawnCts?.Cancel();
-                _despawnCts?.Dispose();
-                _despawnCts = null;
+                StopDespawnDelay();
             }
         }
 
@@ -146,24 +167,34 @@ namespace Scripts
             }
             finally
             {
-                if (_despawnCts != null)
-                {
-                    _despawnCts.Dispose();
-                    _despawnCts = null;
-                }
+                StopDespawnDelay();
             }
         }
+
+        private void StopVisibilityCheckLoop()
+        {
+            _visibilityCts?.Cancel();
+            _visibilityCts?.Dispose();
+            _visibilityCts = null;
+        }
         
+        private void StopDespawnDelay()
+        {
+            _despawnCts?.Cancel();
+            _despawnCts?.Dispose();
+            _despawnCts = null;
+        }
+
         void OnTriggerEnter(Collider2D collider)
         {
             int layer = collider.gameObject.layer;
             if (layer == LayerUtil.Player)
             {
-
+                _playerHitReceiver.ReceiveHit(1);
             }
             else if (layer == LayerUtil.Projectile)
             {
-
+                _model.TakeDamage(1);
             }
         }
     }

@@ -70,6 +70,7 @@
     <Compile Include="Assets\Scripts\EnemyView.cs" />
     <Compile Include="Assets\Scripts\PlayerPresenter.cs" />
     <Compile Include="Assets\Scripts\Utils\CameraExtensions.cs" />
+    <Compile Include="Assets\Scripts\IPlayerHitReceiver.cs" />
     <Compile Include="Assets\Scripts\EnemySpawnerModel.cs" />
     <Compile Include="Assets\Scripts\CrossbowSpawnerModel.cs" />
     <Reference Include="UnityEngine">

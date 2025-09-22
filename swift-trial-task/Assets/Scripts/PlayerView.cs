@@ -28,9 +28,9 @@ namespace Scripts
             _velocity = Vector2.zero;
         }
 
-        public void UpdateHealth(float currentHealth)
+        public void UpdateHealth(float currentNormalizedHealth)
         {
-            _healthBar.DOValue(currentHealth, .2f).SetEase(Ease.OutSine);
+            _healthBar.DOValue(currentNormalizedHealth, .2f).SetEase(Ease.OutSine);
         }
     }
 }
