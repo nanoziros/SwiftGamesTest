@@ -57,20 +57,21 @@ namespace Scripts
 
         private void BindProjectiles()
         {
-            Container.BindInterfacesTo<ProjectileSpawnerPresenter>().AsSingle().NonLazy();
-            Container.BindInstance(_projectilesParent).WithId(PoolTransformIds.ProjectilesParentId);
             Container.Bind<AProjectileView>()
                 .FromInstance(_projectilePrefab)
                 .AsSingle();
-            BindCrosbowBolt();
+            Container.BindInterfacesTo<ProjectileSpawnerPresenter>().AsSingle().NonLazy();
+            Container.BindInstance(_projectilesParent).WithId(PoolTransformIds.ProjectilesParentId);
+            BindCrossbowBolt();
         }
 
-        private void BindCrosbowBolt()
+        private void BindCrossbowBolt()
         {
             Container.BindFactory<IProjectilePresenter, IProjectilePresenter.Factory>()
                 .To<CrossbowBoltPresenter>() 
                 .AsTransient();
             Container.BindInterfacesTo<CrossbowSpawnerModel>().AsSingle();
+            Container.BindInterfacesTo<CrossbowBoltModel>().AsSingle();
         }
     }
 }

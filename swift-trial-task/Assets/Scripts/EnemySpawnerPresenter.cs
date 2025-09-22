@@ -75,7 +75,8 @@ namespace Scripts
             var view = _enemyPool.Get();
             if (!_enemyPresenters.TryGetValue(view, out var presenter))
             {
-                presenter = new EnemyPresenter(view, _playerView, _enemyModel, _playerCamera, _enemyPool, _disposer);
+                presenter = new EnemyPresenter(view, _playerView, _enemyModel, _playerCamera, _disposer);
+                presenter.OnDespawn.Subscribe(enemyView => _enemyPool.Return(enemyView)).AddTo(_disposer);
                 _enemyPresenters[view] = presenter;
             }
             presenter.SetRandomOffScreenPosition();

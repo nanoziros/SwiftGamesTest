@@ -13,18 +13,19 @@ namespace Scripts
         private readonly EnemyView _enemyView;
         private readonly IEnemyModel _model;
         private readonly Camera _camera;
-        private readonly GameObjectPool<EnemyView> _pool;
 
         private CancellationTokenSource _visibilityCts;
         private CancellationTokenSource _despawnCts;
+        
+        private readonly Subject<EnemyView> _onDespawn = new();
+        public IObservable<EnemyView> OnDespawn => _onDespawn;
 
-        public EnemyPresenter(EnemyView enemyEnemyView, PlayerView playerView, IEnemyModel model, Camera camera, GameObjectPool<EnemyView> pool, CompositeDisposable disposer)
+        public EnemyPresenter(EnemyView enemyEnemyView, PlayerView playerView, IEnemyModel model, Camera camera, CompositeDisposable disposer)
         {
             _playerView = playerView;
             _enemyView = enemyEnemyView;
             _model = model;
             _camera = camera;
-            _pool = pool;
 
             StartVisibilityLoop();
             
@@ -35,6 +36,7 @@ namespace Scripts
         public void SetRandomOffScreenPosition()
         {
             var targetPosition = _camera.GetRandomOffScreenPosition(_enemyView.Bounds, _playerView.Velocity);
+            
             // todo: also guarantee the enemy is within the map bounds
             _enemyView.SetPosition(targetPosition);
         }
@@ -95,7 +97,7 @@ namespace Scripts
             try
             {
                 await UniTask.Delay(TimeSpan.FromSeconds(_model.EnemyDespawnDelay), cancellationToken: token);
-                _pool.Return(_enemyView);
+                _onDespawn.OnNext(_enemyView);
             }
             catch (OperationCanceledException)
             {

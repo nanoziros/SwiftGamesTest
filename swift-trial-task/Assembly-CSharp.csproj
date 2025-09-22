@@ -54,6 +54,7 @@
     <Compile Include="Assets\Scripts\EnemySpawnerPresenter.cs" />
     <Compile Include="Assets\Scripts\ProjectileSpawnerPresenter.cs" />
     <Compile Include="Assets\Scripts\CrossbowBoltModel.cs" />
+    <Compile Include="Assets\Scripts\ICrossbowBoltModel.cs" />
     <Compile Include="Assets\Scripts\JoystickView.cs" />
     <Compile Include="Assets\Scripts\EnemyPresenter.cs" />
     <Compile Include="Assets\Scripts\GameInstaller.cs" />

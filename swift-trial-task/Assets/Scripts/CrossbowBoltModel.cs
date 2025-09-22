@@ -1,6 +1,6 @@
 namespace Scripts
 {
-    public class CrossbowBoltModel
+    public class CrossbowBoltModel : ICrossbowBoltModel
     {
         
     }
