@@ -60,6 +60,7 @@
     <Compile Include="Assets\Scripts\GameInstaller.cs" />
     <Compile Include="Assets\Scripts\Utils\GameObjectPool.cs" />
     <Compile Include="Assets\Scripts\AProjectileView.cs" />
+    <Compile Include="Assets\Scripts\IEnemyProvider.cs" />
     <Compile Include="Assets\Scripts\IPlayerModel.cs" />
     <Compile Include="Assets\Scripts\IProjectileSpawnerModel.cs" />
     <Compile Include="Assets\Scripts\IEnemyModel.cs" />

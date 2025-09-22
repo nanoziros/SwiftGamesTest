@@ -13,12 +13,14 @@ namespace Scripts
         private readonly EnemyView _enemyView;
         private readonly IEnemyModel _model;
         private readonly Camera _camera;
-
+        private bool _isOffScreen = true;
         private CancellationTokenSource _visibilityCts;
         private CancellationTokenSource _despawnCts;
         
         private readonly Subject<EnemyView> _onDespawn = new();
         public IObservable<EnemyView> OnDespawn => _onDespawn;
+        public bool IsOffScreen => _isOffScreen;
+        public Vector2 Position => _enemyView.Position;
 
         public EnemyPresenter(EnemyView enemyEnemyView, PlayerView playerView, IEnemyModel model, Camera camera, CompositeDisposable disposer)
         {
@@ -73,9 +75,9 @@ namespace Scripts
 
         private void CheckVisibility()
         {
-            bool offScreen = _camera.IsOffScreen(_enemyView.Bounds);
+            _isOffScreen = _camera.IsOffScreen(_enemyView.Bounds);
 
-            if (offScreen)
+            if (_isOffScreen)
             {
                 if (_despawnCts == null || _despawnCts.IsCancellationRequested)
                 {

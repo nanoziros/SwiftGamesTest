@@ -18,6 +18,7 @@ namespace Scripts
         public IObservable<Unit> OnEnabled => _onEnabled;
         public IObservable<Unit> OnDisabled => _onDisabled;
         
+        public Vector2 Position => transform.position;
         public Bounds Bounds => GetFullBounds();
         
         public void SetPosition(Vector3 position)

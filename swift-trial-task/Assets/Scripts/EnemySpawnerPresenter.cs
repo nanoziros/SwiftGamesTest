@@ -9,7 +9,7 @@ using Zenject;
 
 namespace Scripts
 {
-    public class EnemySpawnerPresenter : IInitializable
+    public class EnemySpawnerPresenter : IInitializable, IEnemyProvider
     {
         private readonly IEnemySpawnerModel _enemySpawnerModel;
         private readonly Camera _playerCamera;
@@ -21,8 +21,10 @@ namespace Scripts
 
         private GameObjectPool<EnemyView> _enemyPool;
         private readonly Dictionary<EnemyView, EnemyPresenter> _enemyPresenters = new();
-        private CancellationTokenSource _spawnLoopCancellationToken;
-
+        private CancellationTokenSource _spawnLoopCts;
+        
+        private readonly List<EnemyPresenter> _visibleBuffer = new();
+        
         public EnemySpawnerPresenter(
             EnemyView enemyPrefab, 
             IEnemyModel enemyModel, 
@@ -43,9 +45,9 @@ namespace Scripts
 
         public void Initialize()
         {
-            _spawnLoopCancellationToken = new CancellationTokenSource();
+            _spawnLoopCts = new CancellationTokenSource();
             _enemyPool = new GameObjectPool<EnemyView>(_enemyPrefab, _enemySpawnerModel.MaxActiveEnemies, _enemiesParent);   
-            SpawnEnemies(_spawnLoopCancellationToken.Token).Forget();
+            SpawnEnemies(_spawnLoopCts.Token).Forget();
         }
         
         private async UniTaskVoid SpawnEnemies(CancellationToken token)
@@ -80,6 +82,20 @@ namespace Scripts
                 _enemyPresenters[view] = presenter;
             }
             presenter.SetRandomOffScreenPosition();
+        }
+        
+        public IReadOnlyList<EnemyPresenter> GetVisibleEnemies()
+        {
+            _visibleBuffer.Clear();
+
+            foreach (var kv in _enemyPresenters)
+            {
+                if (!kv.Value.IsOffScreen)
+                {
+                    _visibleBuffer.Add(kv.Value);
+                }
+            }
+            return _visibleBuffer;
         }
     }
 }
