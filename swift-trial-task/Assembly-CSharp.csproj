@@ -56,6 +56,7 @@
     <Compile Include="Assets\Scripts\CrossbowBoltModel.cs" />
     <Compile Include="Assets\Scripts\ICrossbowBoltModel.cs" />
     <Compile Include="Assets\Scripts\JoystickView.cs" />
+    <Compile Include="Assets\Scripts\Utils\LayerUtil.cs" />
     <Compile Include="Assets\Scripts\EnemyPresenter.cs" />
     <Compile Include="Assets\Scripts\GameInstaller.cs" />
     <Compile Include="Assets\Scripts\Utils\GameObjectPool.cs" />

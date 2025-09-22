@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3065050269147045512}
   - component: {fileID: 1222148391271403938}
   - component: {fileID: 8579800561987063443}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87,7 +87,8 @@ GameObject:
   - component: {fileID: 6423869145328326845}
   - component: {fileID: 7455641530600471565}
   - component: {fileID: 5825845153084015628}
-  m_Layer: 0
+  - component: {fileID: 3361902226113814125}
+  m_Layer: 8
   m_Name: prefab_enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -152,7 +153,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
-  m_Color: {r: 1, g: 0.12422942, b: 0.0990566, a: 1}
+  m_Color: {r: 1, g: 0.3441544, b: 0.09803921, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -177,6 +178,7 @@ MonoBehaviour:
   _healthBarRectTransform: {fileID: 237607390032598236}
   _spriteRenderer: {fileID: 6423869145328326845}
   _healthBar: {fileID: 2184793223118375027}
+  _speed: 1.5
 --- !u!58 &5825845153084015628
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -206,12 +208,39 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 1.5
+--- !u!50 &3361902226113814125
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1608911986764994325}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &4223181340795448850
 GameObject:
   m_ObjectHideFlags: 0
@@ -224,7 +253,7 @@ GameObject:
   - component: {fileID: 7271904757935277928}
   - component: {fileID: 7780582472276392236}
   - component: {fileID: 3892538852401728793}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -325,7 +354,7 @@ GameObject:
   - component: {fileID: 2513196313093561586}
   - component: {fileID: 7396507601218551769}
   - component: {fileID: 3641559093363315932}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -399,7 +428,7 @@ GameObject:
   m_Component:
   - component: {fileID: 237607390032598236}
   - component: {fileID: 2184793223118375027}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: slider_health
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -415,7 +444,7 @@ RectTransform:
   m_GameObject: {fileID: 5294873680575994069}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.45199, y: 0.45199, z: 0.45199}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3065050269147045512}
@@ -424,7 +453,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 65}
+  m_AnchoredPosition: {x: 0, y: -25.4}
   m_SizeDelta: {x: 100, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2184793223118375027
@@ -474,7 +503,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 1
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -487,7 +516,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8370173907160487890}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fill Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}

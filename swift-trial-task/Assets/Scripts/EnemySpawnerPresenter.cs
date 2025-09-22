@@ -82,6 +82,7 @@ namespace Scripts
                 _enemyPresenters[view] = presenter;
             }
             presenter.SetRandomOffScreenPosition();
+            presenter.StartChasingPlayer();
         }
         
         public IReadOnlyList<EnemyPresenter> GetVisibleEnemies()

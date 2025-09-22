@@ -96,8 +96,8 @@ namespace Scripts.Utils
             Vector3 min = bounds.min;
             Vector3 max = bounds.max;
             Rect cameraRect =camera.GetWorldRect();
-            return max.x < cameraRect.xMin || min.x > cameraRect.xMax ||
-                   max.y < cameraRect.yMin || min.y > cameraRect.yMax;
+            return max.x <= cameraRect.xMin || min.x >= cameraRect.xMax ||
+                   max.y <= cameraRect.yMin || min.y >= cameraRect.yMax;
         }
 
 

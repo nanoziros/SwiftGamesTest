@@ -47,10 +47,10 @@ namespace Scripts
 
             _view.SetPosition(_playerView.Position);
 
-            MoveProjectile(_moveCts.Token).Forget();
+            FireProjectile(_moveCts.Token).Forget();
         }
 
-        private async UniTaskVoid MoveProjectile(CancellationToken token)
+        private async UniTaskVoid FireProjectile(CancellationToken token)
         {
             var randomDirection = Random.insideUnitCircle.normalized;
             Vector2 projectileDirection = GetProjectileDirection(randomDirection, _crossbowBoltModel.InitialBiasTowardsEnemy);

@@ -45,7 +45,10 @@ namespace Scripts
         private async UniTaskVoid SpawnProjectiles(CancellationToken token)
         {
             var spawnInterval = TimeSpan.FromSeconds(_model.SpawnInterval);
-
+            var spawnDelay = TimeSpan.FromSeconds(_model.InitialSpawnDelay);
+            
+            await UniTask.Delay(spawnDelay, cancellationToken: token);
+            
             while (!token.IsCancellationRequested)
             {
                 if (_projectilePool.HasAvailableObjects)

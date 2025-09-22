@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6928152853946167400}
   - component: {fileID: 6385806955465550113}
   - component: {fileID: 9017568027942120228}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: prefab_crossbowbolt
   m_TagString: Untagged
   m_Icon: {fileID: 0}

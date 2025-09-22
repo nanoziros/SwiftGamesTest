@@ -2,7 +2,8 @@ namespace Scripts
 {
     public class CrossbowSpawnerModel : IProjectileSpawnerModel
     {
-        public int MaxProjectiles => 1;
-        public float SpawnInterval => 2;
+        public int MaxProjectiles => 5;
+        public float SpawnInterval => 5;
+        public float InitialSpawnDelay => 1;
     }
 }

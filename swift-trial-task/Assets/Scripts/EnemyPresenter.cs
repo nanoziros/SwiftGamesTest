@@ -16,7 +16,8 @@ namespace Scripts
         private bool _isOffScreen = true;
         private CancellationTokenSource _visibilityCts;
         private CancellationTokenSource _despawnCts;
-        
+        private CancellationTokenSource _chasePlayerCts;
+
         private readonly Subject<EnemyView> _onDespawn = new();
         public IObservable<EnemyView> OnDespawn => _onDespawn;
         public bool IsOffScreen => _isOffScreen;
@@ -28,11 +29,21 @@ namespace Scripts
             _enemyView = enemyEnemyView;
             _model = model;
             _camera = camera;
-
-            StartVisibilityLoop();
             
-            _enemyView.OnEnabled.Subscribe(_=> StartVisibilityLoop()).AddTo(disposer);
-            _enemyView.OnDisabled.Subscribe(_ => StopVisibilityLoop()).AddTo(disposer);
+            _enemyView.OnTriggerEntered.Subscribe(OnTriggerEnter).AddTo(disposer);
+            _enemyView.OnEnabled.Subscribe(_=>
+            {
+                StartChasingPlayer();
+                StartVisibilityCheckLoop();
+            }).AddTo(disposer);
+            
+            _enemyView.OnDisabled.Subscribe(_ =>
+            {
+                StopChasingPlayer();
+                StopVisibilityCheckLoop();
+            }).AddTo(disposer);
+            
+            StartVisibilityCheckLoop();
         }
 
         public void SetRandomOffScreenPosition()
@@ -42,8 +53,37 @@ namespace Scripts
             // todo: also guarantee the enemy is within the map bounds
             _enemyView.SetPosition(targetPosition);
         }
+        
+        public void StartChasingPlayer()
+        {
+            if (_chasePlayerCts is { IsCancellationRequested: false })
+            {
+                return;
+            }
 
-        private void StartVisibilityLoop()
+            _chasePlayerCts?.Dispose();
+            _chasePlayerCts = new CancellationTokenSource();
+            ChasePlayer(_chasePlayerCts.Token).Forget();
+        }
+
+        private void StopChasingPlayer()
+        {
+            _chasePlayerCts?.Cancel();
+            _chasePlayerCts?.Dispose();
+            _chasePlayerCts = null;
+        }
+
+        private async UniTaskVoid ChasePlayer(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested && _playerView)
+            {
+                var directionToPlayer = (_playerView.Position - _enemyView.Position).normalized;
+                _enemyView.Move(directionToPlayer);
+                await UniTask.Yield(PlayerLoopTiming.Update, token);
+            }
+        }
+        
+        private void StartVisibilityCheckLoop()
         {
             if (_visibilityCts is { IsCancellationRequested: false })
             {
@@ -52,17 +92,17 @@ namespace Scripts
 
             _visibilityCts?.Dispose();
             _visibilityCts = new CancellationTokenSource();
-            VisibilityLoop(_visibilityCts.Token).Forget();
+            CheckEnemyVisibility(_visibilityCts.Token).Forget();
         }
 
-        private void StopVisibilityLoop()
+        private void StopVisibilityCheckLoop()
         {
             _visibilityCts?.Cancel();
             _visibilityCts?.Dispose();
             _visibilityCts = null;
         }
         
-        private async UniTaskVoid VisibilityLoop(CancellationToken token)
+        private async UniTaskVoid CheckEnemyVisibility(CancellationToken token)
         {
             var interval = TimeSpan.FromSeconds(_model.VisibilityCheckInterval);
 
@@ -111,6 +151,19 @@ namespace Scripts
                     _despawnCts.Dispose();
                     _despawnCts = null;
                 }
+            }
+        }
+        
+        void OnTriggerEnter(Collider2D collider)
+        {
+            int layer = collider.gameObject.layer;
+            if (layer == LayerUtil.Player)
+            {
+
+            }
+            else if (layer == LayerUtil.Projectile)
+            {
+
             }
         }
     }
