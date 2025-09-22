@@ -35,6 +35,7 @@ namespace Scripts
         public void SetRandomOffScreenPosition()
         {
             var targetPosition = _camera.GetRandomOffScreenPosition(_enemyView.Bounds, _playerView.Velocity);
+            // todo: also guarantee the enemy is within the map bounds
             _enemyView.SetPosition(targetPosition);
         }
 

@@ -23,7 +23,14 @@ namespace Scripts
         private readonly Dictionary<EnemyView, EnemyPresenter> _enemyPresenters = new();
         private CancellationTokenSource _spawnLoopCancellationToken;
 
-        public EnemySpawnerPresenter(EnemyView enemyPrefab, IEnemyModel enemyModel, PlayerView playerView, Transform enemiesParent, IEnemySpawnerModel enemySpawnerModel, Camera playerCamera, CompositeDisposable disposer)
+        public EnemySpawnerPresenter(
+            EnemyView enemyPrefab, 
+            IEnemyModel enemyModel, 
+            PlayerView playerView,
+            [Inject(Id = PoolTransformIds.EnemiesParentId)] Transform enemiesParent, 
+            IEnemySpawnerModel enemySpawnerModel, 
+            Camera playerCamera, 
+            CompositeDisposable disposer)
         {
             _enemySpawnerModel = enemySpawnerModel;
             _playerCamera = playerCamera;
