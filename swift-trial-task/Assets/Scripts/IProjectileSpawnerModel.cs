@@ -1,9 +1,13 @@
+using System;
+using UniRx;
+
 namespace Scripts
 {
     public interface IProjectileSpawnerModel
     {
-        public int MaxProjectiles { get;  }
-        public float InitialSpawnDelay { get;  }
-        public float SpawnInterval { get;  }
+        int MaxProjectiles { get; }
+        IObservable<Unit> OnSpawnProjectile { get; }
+        void StartSpawning();
+        void StopSpawning();
     }
 }

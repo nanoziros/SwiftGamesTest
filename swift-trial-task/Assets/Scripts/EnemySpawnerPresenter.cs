@@ -1,107 +1,97 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using Cysharp.Threading.Tasks;
+using Scripts;
 using Scripts.Utils;
 using UniRx;
 using UnityEngine;
 using Zenject;
 
-namespace Scripts
+public class EnemySpawnerPresenter : IInitializable, IEnemyProvider, IDisposable
 {
-    public class EnemySpawnerPresenter : IInitializable, IEnemyProvider
+    private readonly IEnemySpawnerModel _enemySpawnerModel;
+    private readonly EnemyView _enemyPrefab;
+    private readonly EnemyModel.Factory _enemyModelFactory;
+    private readonly PlayerView _playerView;
+    private readonly Camera _playerCamera;
+    private readonly Transform _enemiesParent;
+    private readonly CompositeDisposable _disposer;
+    private readonly IGameEvents _gameEvents;
+
+    private GameObjectPool<EnemyView> _enemyPool;
+    private readonly Dictionary<EnemyView, EnemyPresenter> _enemyPresenters = new();
+    private readonly List<EnemyPresenter> _visibleBuffer = new();
+
+    public EnemySpawnerPresenter(
+        EnemyView enemyPrefab,
+        EnemyModel.Factory enemyModelFactory,
+        PlayerView playerView,
+        Camera playerCamera,
+        [Inject(Id = PoolTransformIds.EnemiesParentId)] Transform enemiesParent,
+        IEnemySpawnerModel enemySpawnerModel,
+        IGameEvents gameEvents,
+        CompositeDisposable disposer)
     {
-        private readonly IEnemySpawnerModel _enemySpawnerModel;
-        private readonly Camera _playerCamera;
-        private readonly Transform _enemiesParent;
-        private readonly EnemyView _enemyPrefab;
-        private readonly EnemyModel.Factory _enemyModelFactory;
-        private readonly PlayerView _playerView;
-        private readonly CompositeDisposable _disposer;
-        private readonly IGameEvents _gameEvents;
-        private GameObjectPool<EnemyView> _enemyPool;
-        private readonly Dictionary<EnemyView, EnemyPresenter> _enemyPresenters = new();
-        private CancellationTokenSource _spawnLoopCts;
-        
-        private readonly List<EnemyPresenter> _visibleBuffer = new();
-        
-        public EnemySpawnerPresenter(
-            EnemyView enemyPrefab, 
-            EnemyModel.Factory enemyModelFactory, 
-            PlayerView playerView,
-            [Inject(Id = PoolTransformIds.EnemiesParentId)] Transform enemiesParent, 
-            IEnemySpawnerModel enemySpawnerModel, 
-            Camera playerCamera, 
-            IGameEvents gameEvents,
-            CompositeDisposable disposer)
+        _enemyPrefab = enemyPrefab;
+        _enemyModelFactory = enemyModelFactory;
+        _playerView = playerView;
+        _playerCamera = playerCamera;
+        _enemiesParent = enemiesParent;
+        _enemySpawnerModel = enemySpawnerModel;
+        _gameEvents = gameEvents;
+        _disposer = disposer;
+    }
+
+    public void Initialize()
+    {
+        _enemyPool = new GameObjectPool<EnemyView>(_enemyPrefab, _enemySpawnerModel.MaxActiveEnemies, _enemiesParent);
+
+        _enemySpawnerModel.OnSpawnEnemy
+            .Subscribe(_ => SpawnEnemy())
+            .AddTo(_disposer);
+
+        _enemySpawnerModel.StartSpawning();
+    }
+
+    private void SpawnEnemy()
+    {
+        if (!_enemyPool.HasAvailableObjects)
         {
-            _enemyModelFactory = enemyModelFactory;
-            _enemySpawnerModel = enemySpawnerModel;
-            _playerCamera = playerCamera;
-            _enemyPrefab = enemyPrefab;
-            _playerView = playerView;
-            _enemiesParent = enemiesParent;
-            _disposer = disposer;
-            _gameEvents = gameEvents;
+            return;
         }
 
-        public void Initialize()
+        var view = _enemyPool.Get();
+
+        if (!_enemyPresenters.TryGetValue(view, out var presenter))
         {
-            _spawnLoopCts = new CancellationTokenSource();
-            _enemyPool = new GameObjectPool<EnemyView>(_enemyPrefab, _enemySpawnerModel.MaxActiveEnemies, _enemiesParent);   
-            SpawnEnemies(_spawnLoopCts.Token).Forget();
-        }
-        
-        private async UniTaskVoid SpawnEnemies(CancellationToken token)
-        {
-            var spawnInterval = TimeSpan.FromSeconds(_enemySpawnerModel.SpawnInterval);
-            var enemyBatch = _enemySpawnerModel.EnemySpawnBatch;
-            while (!token.IsCancellationRequested)
-            {
-                SpawnEnemyBatch(enemyBatch);
-                await UniTask.Delay(spawnInterval, cancellationToken: token);
-            }
+            var enemyModel = _enemyModelFactory.Create();
+            presenter = new EnemyPresenter(view, _playerView, enemyModel, _playerCamera, _gameEvents, _disposer);
+
+            presenter.OnDespawn
+                     .Subscribe(e => _enemyPool.Return(e))
+                     .AddTo(_disposer);
+
+            _enemyPresenters[view] = presenter;
         }
 
-        private void SpawnEnemyBatch(int enemyBatch)
-        {
-            for (int i = 0; i < enemyBatch; i++)
-            {
-                if (_enemyPool.HasAvailableObjects)
-                {
-                    SpawnEnemy();
-                }
-            }
-        }
+        presenter.Initialize();
+        presenter.SetRandomOffScreenPosition();
+        presenter.StartChasingPlayer();
+    }
 
-        private void SpawnEnemy()
+    public IReadOnlyList<EnemyPresenter> GetVisibleEnemies()
+    {
+        _visibleBuffer.Clear();
+        foreach (var kv in _enemyPresenters)
         {
-            var view = _enemyPool.Get();
-            if (!_enemyPresenters.TryGetValue(view, out var presenter))
-            {
-                var enemyModel = _enemyModelFactory.Create();
-                presenter = new EnemyPresenter(view, _playerView, enemyModel, _playerCamera, _gameEvents, _disposer);
-                presenter.OnDespawn.Subscribe(enemyView => _enemyPool.Return(enemyView)).AddTo(_disposer);
-                _enemyPresenters[view] = presenter;
-            }
-
-            presenter.Initialize();
-            presenter.SetRandomOffScreenPosition();
-            presenter.StartChasingPlayer();
+            if (!kv.Value.IsOffScreen)
+                _visibleBuffer.Add(kv.Value);
         }
-        
-        public IReadOnlyList<EnemyPresenter> GetVisibleEnemies()
-        {
-            _visibleBuffer.Clear();
+        return _visibleBuffer;
+    }
 
-            foreach (var kv in _enemyPresenters)
-            {
-                if (!kv.Value.IsOffScreen)
-                {
-                    _visibleBuffer.Add(kv.Value);
-                }
-            }
-            return _visibleBuffer;
-        }
+    public void Dispose()
+    {
+        _disposer.Dispose();
+        _enemySpawnerModel.StopSpawning();
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UniRx;
 
 namespace Scripts
@@ -9,6 +10,8 @@ namespace Scripts
         public float VisibilityCheckInterval { get; }
         public float EnemyDespawnDelay { get; }
         public float EnemyDamage { get; }
+        
+        public IObservable<Unit> OnDeath {get; }
         
         void TakeDamage(float damage);
         void Reset();

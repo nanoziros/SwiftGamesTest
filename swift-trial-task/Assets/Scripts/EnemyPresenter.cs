@@ -43,14 +43,11 @@ namespace Scripts
 
         private void SubscribeEvents(CompositeDisposable disposer)
         {
+            _model.OnDeath.Subscribe(_=> KillEnemy()).AddTo(disposer);
             _model.CurrentHealth
                 .Subscribe(currentHealth =>
                 {
                     _enemyView.UpdateHealth(currentHealth / _model.MaxHealth);
-                    if (currentHealth <= 0)
-                    {
-                        KillEnemy();
-                    }
                 })
                 .AddTo(disposer);
             _enemyView.OnTriggerEntered.Subscribe(OnTriggerEnter).AddTo(disposer);
