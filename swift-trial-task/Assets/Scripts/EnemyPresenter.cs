@@ -51,7 +51,7 @@ namespace Scripts
                     _enemyView.UpdateHealth(currentHealth / _model.MaxHealth);
                 })
                 .AddTo(disposer);
-            _enemyView.OnTriggerEntered.Subscribe(OnTriggerEnter).AddTo(disposer);
+            _enemyView.OnGameObjectEntered.Subscribe(OnGameObjectCollision).AddTo(disposer);
             
             _enemyView.OnEnabled.Subscribe(_=>
             {
@@ -88,7 +88,7 @@ namespace Scripts
             var targetPosition = _camera.GetRandomOffScreenPosition(_enemyView.Bounds, _playerView.Velocity);
             
             // todo: also guarantee the enemy is within the map bounds
-            _enemyView.SetPosition(targetPosition);
+            _enemyView.SetPositionAndRotation(targetPosition, Quaternion.identity);
         }
         
         public void StartChasingPlayer()
@@ -116,7 +116,7 @@ namespace Scripts
             {
                 var directionToPlayer = (_playerView.Position - _enemyView.Position).normalized;
                 _enemyView.Move(directionToPlayer);
-                await UniTask.Yield(PlayerLoopTiming.Update, token);
+                await UniTask.Yield(PlayerLoopTiming.FixedUpdate, token);
             }
         }
         
@@ -192,9 +192,9 @@ namespace Scripts
             _despawnCts = null;
         }
 
-        void OnTriggerEnter(Collider2D collider)
+        void OnGameObjectCollision(GameObject colliderObject)
         {
-            int layer = collider.gameObject.layer;
+            int layer = colliderObject.layer;
             if (layer == LayerUtil.Player)
             {
                 _gameEvents.PlayerHit(_model.EnemyDamage);
