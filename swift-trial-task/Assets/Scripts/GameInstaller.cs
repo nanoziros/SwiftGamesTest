@@ -16,6 +16,8 @@ namespace Scripts
         
         [SerializeField] private EnemyView _enemyPrefab;
         [SerializeField] private Transform _enemiesParent;
+        
+        [SerializeField] private PlayerHudView _playerHudView;
 
         private readonly CompositeDisposable _disposer = new();
         
@@ -30,12 +32,20 @@ namespace Scripts
             BindProjectiles();
             BindPlayer();
             BindEnemies();
+            BindHud();
+        }
+
+        private void BindHud()
+        {
+            Container.BindInstance(_playerHudView);
+            Container.BindInterfacesTo<PlayerHudModel>().AsSingle();
+            Container.BindInterfacesTo<PlayerHudPresenter>().AsSingle().NonLazy();
         }
 
         private void BindCore()
         {
+            Container.BindInterfacesTo<GameEvents>().AsSingle();
             Container.BindInterfacesAndSelfTo<CompositeDisposable>().AsSingle();
-            Container.BindInstance(_playerView);
             Container.BindInstance(_joyStick);
             Container.BindInstance(_camera);
         }
@@ -51,6 +61,7 @@ namespace Scripts
 
         private void BindPlayer()
         {
+            Container.BindInstance(_playerView);
             Container.BindInterfacesTo<PlayerModel>().AsSingle();
             Container.BindInterfacesTo<PlayerPresenter>().AsSingle().NonLazy();
         }

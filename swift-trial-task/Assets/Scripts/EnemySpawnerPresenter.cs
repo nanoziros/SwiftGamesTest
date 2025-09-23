@@ -18,8 +18,7 @@ namespace Scripts
         private readonly EnemyModel.Factory _enemyModelFactory;
         private readonly PlayerView _playerView;
         private readonly CompositeDisposable _disposer;
-        private readonly IPlayerHitReceiver _playerHitReceiver;
-
+        private readonly IGameEvents _gameEvents;
         private GameObjectPool<EnemyView> _enemyPool;
         private readonly Dictionary<EnemyView, EnemyPresenter> _enemyPresenters = new();
         private CancellationTokenSource _spawnLoopCts;
@@ -33,7 +32,7 @@ namespace Scripts
             [Inject(Id = PoolTransformIds.EnemiesParentId)] Transform enemiesParent, 
             IEnemySpawnerModel enemySpawnerModel, 
             Camera playerCamera, 
-            IPlayerHitReceiver playerHitReceiver,
+            IGameEvents gameEvents,
             CompositeDisposable disposer)
         {
             _enemyModelFactory = enemyModelFactory;
@@ -43,7 +42,7 @@ namespace Scripts
             _playerView = playerView;
             _enemiesParent = enemiesParent;
             _disposer = disposer;
-            _playerHitReceiver = playerHitReceiver;
+            _gameEvents = gameEvents;
         }
 
         public void Initialize()
@@ -81,7 +80,7 @@ namespace Scripts
             if (!_enemyPresenters.TryGetValue(view, out var presenter))
             {
                 var enemyModel = _enemyModelFactory.Create();
-                presenter = new EnemyPresenter(view, _playerView, enemyModel, _playerCamera, _playerHitReceiver, _disposer);
+                presenter = new EnemyPresenter(view, _playerView, enemyModel, _playerCamera, _gameEvents, _disposer);
                 presenter.OnDespawn.Subscribe(enemyView => _enemyPool.Return(enemyView)).AddTo(_disposer);
                 _enemyPresenters[view] = presenter;
             }

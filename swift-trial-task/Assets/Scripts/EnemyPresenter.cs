@@ -9,7 +9,7 @@ namespace Scripts
 {
     public class EnemyPresenter
     {
-        private readonly IPlayerHitReceiver _playerHitReceiver;
+        private readonly IGameEvents _gameEvents;
         private readonly PlayerView _playerView;
         private readonly EnemyView _enemyView;
         private readonly IEnemyModel _model;
@@ -29,32 +29,30 @@ namespace Scripts
             PlayerView playerView,
             IEnemyModel model,
             Camera camera,
-            IPlayerHitReceiver playerHitReceiver,
+            IGameEvents gameEvents,
             CompositeDisposable disposer)
         {
             _playerView = playerView;
             _enemyView = enemyEnemyView;
             _model = model;
             _camera = camera;
-            _playerHitReceiver = playerHitReceiver;
-            
+            _gameEvents = gameEvents;
+            SubscribeEvents(disposer);
+            StartVisibilityCheckLoop();
+        }
+
+        private void SubscribeEvents(CompositeDisposable disposer)
+        {
             _model.CurrentHealth
                 .Subscribe(currentHealth =>
                 {
                     _enemyView.UpdateHealth(currentHealth / _model.MaxHealth);
+                    if (currentHealth <= 0)
+                    {
+                        KillEnemy();
+                    }
                 })
                 .AddTo(disposer);
-            _model.CurrentHealth
-                .Where(health => health <= 0)
-                .Distinct()
-                .Subscribe(_ =>
-                {
-                    StopVisibilityCheckLoop();
-                    StopDespawnDelay();
-                    _onDespawn.OnNext(_enemyView);
-                })
-                .AddTo(disposer);
-            
             _enemyView.OnTriggerEntered.Subscribe(OnTriggerEnter).AddTo(disposer);
             
             _enemyView.OnEnabled.Subscribe(_=>
@@ -67,8 +65,15 @@ namespace Scripts
                 StopChasingPlayer();
                 StopVisibilityCheckLoop();
             }).AddTo(disposer);
-            
-            StartVisibilityCheckLoop();
+        }
+
+        private void KillEnemy()
+        {
+            StopVisibilityCheckLoop();
+            StopDespawnDelay();
+
+            _gameEvents.EnemyKilled();
+            _onDespawn.OnNext(_enemyView);
         }
 
         public void Initialize()
@@ -190,7 +195,7 @@ namespace Scripts
             int layer = collider.gameObject.layer;
             if (layer == LayerUtil.Player)
             {
-                _playerHitReceiver.ReceiveHit(1);
+                _gameEvents.PlayerHit(_model.EnemyDamage);
             }
             else if (layer == LayerUtil.Projectile)
             {
