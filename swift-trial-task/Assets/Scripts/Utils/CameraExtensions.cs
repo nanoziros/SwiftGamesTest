@@ -16,11 +16,12 @@ namespace Scripts.Utils
         {
             var worldRect = camera.GetWorldRect();
             
-            float halfWidth = targetObjectBounds.extents.x;
-            float halfHeight = targetObjectBounds.extents.y;
+            var halfWidth = targetObjectBounds.extents.x;
+            var halfHeight = targetObjectBounds.extents.y;
 
-            ViewSide side = SelectBiasedSide(biasDirection);
-            float x = 0f, y = 0f;
+            var side = SelectBiasedSide(biasDirection);
+            var x = 0f;
+            var y = 0f;
 
             switch (side)
             {
@@ -54,14 +55,14 @@ namespace Scripts.Utils
                 return GetRandomViewSide();
             }
 
-            Vector2 dir = biasDirection.normalized;
+            var dir = biasDirection.normalized;
 
-            float topWeight = Mathf.Max(0f, dir.y);
-            float bottomWeight = Mathf.Max(0f, -dir.y);
-            float rightWeight = Mathf.Max(0f, dir.x);
-            float leftWeight = Mathf.Max(0f, -dir.x);
+            var topWeight = Mathf.Max(0f, dir.y);
+            var bottomWeight = Mathf.Max(0f, -dir.y);
+            var rightWeight = Mathf.Max(0f, dir.x);
+            var leftWeight = Mathf.Max(0f, -dir.x);
 
-            float total = topWeight + bottomWeight + leftWeight + rightWeight;
+            var total = topWeight + bottomWeight + leftWeight + rightWeight;
             
             if (total <= 0f)
             {
@@ -93,9 +94,9 @@ namespace Scripts.Utils
         
         public static bool IsOffScreen(this Camera camera, Bounds bounds)
         {
-            Vector3 min = bounds.min;
-            Vector3 max = bounds.max;
-            Rect cameraRect =camera.GetWorldRect();
+            var min = bounds.min;
+            var max = bounds.max;
+            var cameraRect =camera.GetWorldRect();
             return max.x <= cameraRect.xMin || min.x >= cameraRect.xMax ||
                    max.y <= cameraRect.yMin || min.y >= cameraRect.yMax;
         }

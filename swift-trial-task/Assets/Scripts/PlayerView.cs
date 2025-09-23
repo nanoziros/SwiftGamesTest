@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Scripts.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,10 +18,7 @@ namespace Scripts
 
         public void Move(Vector2 direction)
         {
-            var oldPosition = transform.position;
-            _velocity = direction * _speed;
-            transform.position = Vector3.Lerp(oldPosition, oldPosition + (Vector3)_velocity,
-                Time.deltaTime);
+            _velocity = transform.Move(direction, _speed);
         }
         
         public void OnMoveEnd()

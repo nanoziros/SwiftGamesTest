@@ -1,12 +1,13 @@
 using System;
 using UniRx;
 
-public interface IEnemySpawnerModel
+namespace Scripts
 {
-    int MaxActiveEnemies { get; }
-    int EnemySpawnBatch { get; }
-    float SpawnInterval { get; }
-    IObservable<Unit> OnSpawnEnemy { get; }
-    void StartSpawning();
-    void StopSpawning();
+    public interface IEnemySpawnerModel
+    {
+        int MaxActiveEnemies { get; }
+        IObservable<Unit> OnSpawnEnemy { get; }
+        void StartSpawning();
+        void StopSpawning();
+    }
 }

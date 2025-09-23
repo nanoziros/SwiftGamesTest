@@ -88,7 +88,7 @@ namespace Scripts
             var targetPosition = _camera.GetRandomOffScreenPosition(_enemyView.Bounds, _playerView.Velocity);
             
             // todo: also guarantee the enemy is within the map bounds
-            _enemyView.SetPositionAndRotation(targetPosition, Quaternion.identity);
+            _enemyView.SetPosition(targetPosition);
         }
         
         public void StartChasingPlayer()
@@ -192,9 +192,10 @@ namespace Scripts
             _despawnCts = null;
         }
 
+        // todo: this can be replaced with continuous collision in order to deal damage to the player so long they stay touching an enemy
         void OnGameObjectCollision(GameObject colliderObject)
         {
-            int layer = colliderObject.layer;
+            var layer = colliderObject.layer;
             if (layer == LayerUtil.Player)
             {
                 _gameEvents.PlayerHit(_model.EnemyDamage);

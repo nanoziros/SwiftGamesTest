@@ -1,38 +1,39 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Scripts;
 using UniRx;
 
-public class CrossbowSpawnerModel : IProjectileSpawnerModel
+namespace Scripts
 {
-    private readonly Subject<Unit> _onSpawnProjectile = new();
-    public IObservable<Unit> OnSpawnProjectile => _onSpawnProjectile;
-
-    public int MaxProjectiles => 5;
-    public float InitialSpawnDelay => 1;
-    public float SpawnInterval => 5;
-
-    private CancellationTokenSource _cts;
-
-    public void StartSpawning()
+    public class CrossbowSpawnerModel : IProjectileSpawnerModel
     {
-        _cts = new CancellationTokenSource();
-        SpawnLoop(_cts.Token).Forget();
-    }
+        private readonly Subject<Unit> _onSpawnProjectile = new();
 
-    public void StopSpawning()
-    {
-        _cts?.Cancel();
-    }
+        public int MaxProjectiles => 5;
+        private float InitialSpawnDelay => 1;
+        private float SpawnInterval => 5;
+        public IObservable<Unit> OnSpawnProjectile => _onSpawnProjectile;
+        private CancellationTokenSource _cts;
 
-    private async UniTaskVoid SpawnLoop(CancellationToken token)
-    {
-        await UniTask.Delay(TimeSpan.FromSeconds(InitialSpawnDelay), cancellationToken: token);
-        while (!token.IsCancellationRequested)
+        public void StartSpawning()
         {
-            _onSpawnProjectile.OnNext(Unit.Default);
-            await UniTask.Delay(TimeSpan.FromSeconds(SpawnInterval), cancellationToken: token);
+            _cts = new CancellationTokenSource();
+            SpawnLoop(_cts.Token).Forget();
+        }
+
+        public void StopSpawning()
+        {
+            _cts?.Cancel();
+        }
+
+        private async UniTaskVoid SpawnLoop(CancellationToken token)
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(InitialSpawnDelay), cancellationToken: token);
+            while (!token.IsCancellationRequested)
+            {
+                _onSpawnProjectile.OnNext(Unit.Default);
+                await UniTask.Delay(TimeSpan.FromSeconds(SpawnInterval), cancellationToken: token);
+            }
         }
     }
 }

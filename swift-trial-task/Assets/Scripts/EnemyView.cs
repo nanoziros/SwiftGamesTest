@@ -28,9 +28,8 @@ namespace Scripts
         public Vector2 Position => transform.position;
         public Bounds Bounds => GetFullBounds();
         
-        public void SetPositionAndRotation(Vector3 position, Quaternion rotation)
+        public void SetPosition(Vector3 position)
         {
-            transform.rotation = rotation;
             transform.position = position;
         }
         

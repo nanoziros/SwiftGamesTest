@@ -90,8 +90,8 @@ namespace Scripts
                 direction = TryBounceProjectile(direction);
                 
                 _view.Move(direction);
-                distanceTravelled += _view.Velocity.magnitude * Time.deltaTime;
                 
+                distanceTravelled += _view.Velocity.magnitude * Time.deltaTime;
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
             _onDespawn.OnNext(_view);
@@ -99,8 +99,8 @@ namespace Scripts
 
         private Vector2 TryBounceProjectile(Vector2 direction)
         {
-            Vector2 screenPos = _camera.WorldToViewportPoint(_view.Position);
-            bool bouncedThisFrame = false;
+            var screenPos = _camera.WorldToViewportPoint(_view.Position);
+            var bouncedThisFrame = false;
 
             if (screenPos.x < 0f)
             {

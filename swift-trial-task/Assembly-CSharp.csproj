@@ -73,6 +73,7 @@
     <Compile Include="Assets\Scripts\IProjectilePresenter.cs" />
     <Compile Include="Assets\Scripts\EnemyView.cs" />
     <Compile Include="Assets\Scripts\PlayerPresenter.cs" />
+    <Compile Include="Assets\Scripts\Utils\TransformExtensions.cs" />
     <Compile Include="Assets\Scripts\PlayerHudModel.cs" />
     <Compile Include="Assets\Scripts\Utils\CameraExtensions.cs" />
     <Compile Include="Assets\Scripts\IGameEvents.cs" />

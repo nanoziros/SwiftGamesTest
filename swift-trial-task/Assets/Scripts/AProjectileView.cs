@@ -1,4 +1,5 @@
 using System;
+using Scripts.Utils;
 using UniRx;
 using UnityEngine;
 
@@ -22,10 +23,7 @@ namespace Scripts
         
         public void Move(Vector2 direction)
         {
-            var oldPosition = transform.position;
-            _velocity = direction * _speed;
-            transform.position = Vector3.Lerp(oldPosition, oldPosition + (Vector3)_velocity,
-                Time.deltaTime);
+            _velocity = transform.Move(direction, _speed);
         }
 
         private void OnDisable()

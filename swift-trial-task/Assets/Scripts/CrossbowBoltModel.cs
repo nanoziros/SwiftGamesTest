@@ -4,6 +4,6 @@ namespace Scripts
     {
         public float InitialBiasTowardsEnemy => 0.75f;
         public float AfterBounceBiasTowardsEnemy => 1f;
-        public float MaxDistance => 20;
+        public float MaxDistance => 20f;
     }
 }

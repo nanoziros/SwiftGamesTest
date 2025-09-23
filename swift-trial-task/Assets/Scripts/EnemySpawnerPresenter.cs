@@ -61,16 +61,13 @@ public class EnemySpawnerPresenter : IInitializable, IEnemyProvider, IDisposable
         }
 
         var view = _enemyPool.Get();
-
         if (!_enemyPresenters.TryGetValue(view, out var presenter))
         {
             var enemyModel = _enemyModelFactory.Create();
             presenter = new EnemyPresenter(view, _playerView, enemyModel, _playerCamera, _gameEvents, _disposer);
-
             presenter.OnDespawn
                      .Subscribe(e => _enemyPool.Return(e))
                      .AddTo(_disposer);
-
             _enemyPresenters[view] = presenter;
         }
 
