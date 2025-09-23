@@ -1,3 +1,4 @@
+using System;
 using UniRx;
 
 namespace Scripts
@@ -5,7 +6,8 @@ namespace Scripts
     public interface IPlayerModel
     {
         void TakeDamage(float damage);
-        IReadOnlyReactiveProperty<float> CurrentHealth { get; }
         public float MaxHealth { get; }
+        IReadOnlyReactiveProperty<float> CurrentHealth { get; }
+        public IObservable<Unit> OnDeath {get; }
     }
 }

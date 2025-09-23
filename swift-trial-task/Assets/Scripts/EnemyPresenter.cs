@@ -43,6 +43,7 @@ namespace Scripts
 
         private void SubscribeEvents(CompositeDisposable disposer)
         {
+            _gameEvents.OnPlayerDied.Subscribe(_ => StopEnemyLoops()).AddTo(disposer);
             _model.OnDeath.Subscribe(_=> KillEnemy()).AddTo(disposer);
             _model.CurrentHealth
                 .Subscribe(currentHealth =>
@@ -59,18 +60,22 @@ namespace Scripts
             }).AddTo(disposer);
             _enemyView.OnDisabled.Subscribe(_ =>
             {
-                StopChasingPlayer();
-                StopVisibilityCheckLoop();
+                StopEnemyLoops();
             }).AddTo(disposer);
         }
 
         private void KillEnemy()
         {
-            StopVisibilityCheckLoop();
-            StopDespawnDelay();
-
+            StopEnemyLoops();
             _gameEvents.EnemyKilled();
             _onDespawn.OnNext(_enemyView);
+        }
+
+        private void StopEnemyLoops()
+        {
+            StopChasingPlayer();
+            StopVisibilityCheckLoop();
+            StopDespawnDelay();
         }
 
         public void Initialize()

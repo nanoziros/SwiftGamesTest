@@ -14,7 +14,8 @@ namespace Scripts
         private readonly ICrossbowBoltModel _crossbowBoltModel;
         private readonly Camera _camera;
         private readonly IEnemyProvider _enemyProvider;
-
+        private readonly IGameEvents _gameEvents;
+        private readonly CompositeDisposable _disposer;
         private CancellationTokenSource _moveCts;
 
         private readonly Subject<CrossbowBoltView> _onDespawn = new();
@@ -24,12 +25,16 @@ namespace Scripts
             PlayerView playerView,
             ICrossbowBoltModel model,
             Camera camera,
-            IEnemyProvider enemySpawnerPresenter)
+            IGameEvents gameEvents,
+            IEnemyProvider enemySpawnerPresenter,
+            CompositeDisposable disposer)
         {
             _enemyProvider = enemySpawnerPresenter;
             _playerView = playerView;
             _crossbowBoltModel = model;
             _camera = camera;
+            _gameEvents = gameEvents;
+            _disposer = disposer;
         }
 
         public void Initialize(AProjectileView view)
@@ -37,7 +42,8 @@ namespace Scripts
             _view = view as CrossbowBoltView
                     ?? throw new InvalidOperationException($"Expected CrossbowBoltView, got {view.GetType()}");
             
-            view.OnDisabled.Subscribe(_ => OnViewDisabled());
+            _gameEvents.OnPlayerDied.Subscribe(_ => OnViewDisabled()).AddTo(_disposer);
+            view.OnDisabled.Subscribe(_ => OnViewDisabled()).AddTo(_disposer);
         }
         
         public void Fire()

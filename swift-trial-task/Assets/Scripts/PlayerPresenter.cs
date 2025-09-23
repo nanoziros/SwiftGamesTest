@@ -21,12 +21,14 @@ namespace Scripts
 
         public void Initialize()
         {
-            _joystickView.OnInput.Subscribe(_playerView.Move).AddTo(_disposer);
-            _joystickView.OnInputEnd.Subscribe(_ => _playerView.OnMoveEnd()).AddTo(_disposer);
+            _joystickView.OnInput.TakeUntil(_gameEvents.OnPlayerDied).Subscribe(_playerView.Move).AddTo(_disposer);
+            _joystickView.OnInputEnd.TakeUntil(_gameEvents.OnPlayerDied).Subscribe(_ => _playerView.OnMoveEnd()).AddTo(_disposer);
             
-            _gameEvents.OnPlayerHit
+            _gameEvents.OnPlayerHit.TakeUntil(_gameEvents.OnPlayerDied)
                 .Subscribe(_playerModel.TakeDamage)
                 .AddTo(_disposer);
+            
+            _playerModel.OnDeath.Subscribe(_ => _gameEvents.PlayerDied()).AddTo(_disposer);
             _playerModel.CurrentHealth
                 .Subscribe(currentHealth =>
                 {

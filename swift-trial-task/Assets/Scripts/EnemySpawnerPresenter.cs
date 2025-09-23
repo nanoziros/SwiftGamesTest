@@ -45,6 +45,7 @@ public class EnemySpawnerPresenter : IInitializable, IEnemyProvider, IDisposable
     {
         _enemyPool = new GameObjectPool<EnemyView>(_enemyPrefab, _enemySpawnerModel.MaxActiveEnemies, _enemiesParent);
 
+        _gameEvents.OnPlayerDied.Subscribe(_ => _enemySpawnerModel.StopSpawning()).AddTo(_disposer);
         _enemySpawnerModel.OnSpawnEnemy
             .Subscribe(_ => SpawnEnemy())
             .AddTo(_disposer);

@@ -14,6 +14,7 @@ namespace Scripts
         private readonly IFactory<IProjectilePresenter> _presenterFactory;
         private readonly AProjectileView _projectilePrefab;
         private readonly CompositeDisposable _disposer;
+        private readonly IGameEvents _gameEvents;
 
         private GameObjectPool<AProjectileView> _projectilePool;
         private readonly Dictionary<AProjectileView, IProjectilePresenter> _presenters = new();
@@ -23,6 +24,7 @@ namespace Scripts
             AProjectileView projectilePrefab,
             [Inject(Id = PoolTransformIds.ProjectilesParentId)] Transform projectilesParent,
             IProjectilePresenter.Factory presenterFactory,
+            IGameEvents gameEvents,
             CompositeDisposable disposer)
         {
             _model = projectileSpawnerModel;
@@ -30,11 +32,15 @@ namespace Scripts
             _projectilesParent = projectilesParent;
             _presenterFactory = presenterFactory;
             _disposer = disposer;
+            _gameEvents = gameEvents;
         }
 
         public void Initialize()
         {
             _projectilePool = new GameObjectPool<AProjectileView>(_projectilePrefab, _model.MaxProjectiles, _projectilesParent);
+
+
+            _gameEvents.OnPlayerDied.Subscribe(_ => _model.StopSpawning()).AddTo(_disposer);
             _model.OnSpawnProjectile
                   .Subscribe(_ => SpawnProjectile())
                   .AddTo(_disposer);

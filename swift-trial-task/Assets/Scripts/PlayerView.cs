@@ -32,5 +32,10 @@ namespace Scripts
         {
             _healthBar.DOValue(currentNormalizedHealth, .2f).SetEase(Ease.OutSine);
         }
+
+        public void Disable()
+        {
+            // todo: here could play a death animation
+        }
     }
 }
